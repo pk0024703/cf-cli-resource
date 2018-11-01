@@ -45,6 +45,10 @@ cf_dial_timeout=$(jq -r '.source.cf_dial_timeout //empty' < $payload) && [ -n "$
 cf_trace=$(jq -r '.source.cf_trace //empty' < $payload) && echo "$cf_trace" | grep -qi 'true' && export CF_TRACE=true
 command_file=$(echo "$params" | jq -r '.command_file //empty')
 
+if [ -z "$command_file" ]; then
+  printf '\e[91m[ERROR]\e[0m invalid payload (missing command_file)\n $command_file'
+fi
+
 if [ -z "$api" ]; then
   printf '\e[91m[ERROR]\e[0m invalid payload (missing api)\n'
   exit 1
@@ -71,6 +75,7 @@ if [ -r "$command_file" ]; then
 fi
 
 cd "$working_dir"
+printf '\e[92m[INFO]\e[0m %s\n' "$working_dir"
 
 printf '\e[92m[INFO]\e[0m %s\n' "$(cf --version)"
 
